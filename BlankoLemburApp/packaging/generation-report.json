@@ -1,0 +1,8 @@
+{
+  "status": "PASS",
+  "two_dates": true,
+  "seven_job_rows": true,
+  "xml_special_characters": true,
+  "template_assets_preserved": true,
+  "note": "Direct core generation check; separate EXE GUI check required."
+}

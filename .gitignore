@@ -1,0 +1,22 @@
+# Build outputs and packaged binaries
+*.exe
+BlankoLemburApp/.build/
+
+# Local verification and generated work artifacts
+.packaging-verification/
+.recap-work/
+
+# Python cache and test artifacts
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Local environment and secrets
+.env
+.venv/
+venv/
+*.pem
+*.key
+
+# Local application data
+*.csv

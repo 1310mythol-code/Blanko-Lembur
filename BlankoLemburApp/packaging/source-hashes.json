@@ -1,0 +1,26 @@
+﻿[
+    {
+        "Path":  "C:\\Users\\user\\Downloads\\Blanko_Lembur_Otomatis\\BlankoLemburApp\\blanko_lembur.py",
+        "Hash":  "5A463DA13D993CAA0EE485D9C94FE3598F37BDB6EFE925C9E5D6C4DEC445EA22"
+    },
+    {
+        "Path":  "C:\\Users\\user\\Downloads\\Blanko_Lembur_Otomatis\\BlankoLemburApp\\core.py",
+        "Hash":  "F2AC11A3680C916594DD0B5FDA67CE77BF04067149EDBFD39BC307DE8966EAF1"
+    },
+    {
+        "Path":  "C:\\Users\\user\\Downloads\\Blanko_Lembur_Otomatis\\BlankoLemburApp\\blanko_template.docx",
+        "Hash":  "FA787603A9EEE5FB6030D872318BC1FFF7C1552AD2DF1AE26E9C9A8BD83BF2C9"
+    },
+    {
+        "Path":  "C:\\Users\\user\\Downloads\\Blanko_Lembur_Otomatis\\BlankoLemburApp\\data\\profil.csv",
+        "Hash":  "2DA596FF49E93DDA7C3C105C19E7BAEAE87E8AA451D8600BA6F0B4AD3DCB5DE1"
+    },
+    {
+        "Path":  "C:\\Users\\user\\Downloads\\Blanko_Lembur_Otomatis\\BlankoLemburApp\\data\\pejabat.csv",
+        "Hash":  "AE218D5F404CAE1251CE63867E7682938229ED408A0CDE062170F717A5FA03D2"
+    },
+    {
+        "Path":  "C:\\Users\\user\\Downloads\\Blanko_Lembur_Otomatis\\BlankoLemburApp\\data\\lembur_records.csv",
+        "Hash":  "2450B6B6EA9E4AEC1B65D022C975FF4B79A78A68600D35F7B824BEBFA8F101DC"
+    }
+]
