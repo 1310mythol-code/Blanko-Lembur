@@ -722,7 +722,7 @@ class BlankoLemburApp(tk.Tk):
         self.install_update_button.pack_forget()
         if release is None:
             self.update_status_var.set(
-                f"Versi {APP_VERSION} sudah terbaru. Belum ada pembaruan baru di GitHub."
+                f"Versi {APP_VERSION} sudah terbaru."
             )
             return
         notes = release.notes[:1200] + ("…" if len(release.notes) > 1200 else "")

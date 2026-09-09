@@ -13,7 +13,7 @@ def build(app) -> None:
         app.info_tab,
         "04",
         "Info aplikasi",
-        "Tentang Blanko Lembur Otomatis dan pembaruan aplikasi.",
+        "Tentang Aplikasi Blanko Lembur Otomatis.",
     )
     intro.pack(fill="x", pady=(0, 24))
     card = tk.Frame(app.info_tab, bg=COLORS["surface_alt"], padx=28, pady=26,
@@ -34,7 +34,7 @@ def build(app) -> None:
     app.install_update_button = ttk.Button(actions, text="Unduh & Perbarui", style="Success.TButton",
                                            command=app._download_available_update)
     app.update_status_var = tk.StringVar(value=(
-        "Siap memeriksa pembaruan resmi melalui GitHub." if updater.is_configured()
+        "Tekan tombol untuk memeriksa pembaruan." if updater.is_configured()
         else "Pembaruan online belum diaktifkan. Aplikasi tetap dapat digunakan."
     ))
     tk.Label(card, textvariable=app.update_status_var, bg=COLORS["surface_alt"],

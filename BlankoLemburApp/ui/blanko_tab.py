@@ -81,9 +81,6 @@ def _build_daily_input(app, parent: tk.Frame) -> None:
     ttk.Label(heading_copy, text="Input blanko harian", style="Title.Card.TLabel").pack(anchor="w")
     ttk.Label(heading_copy, text="Pilih tanggal, atur jam, lalu tambahkan pekerjaan.",
               style="Muted.Card.TLabel", font=("Segoe UI", 9)).pack(anchor="w", pady=(2, 0))
-    app.edit_mode_label = tk.Label(heading, text="BARU", bg=COLORS["soft_blue"], fg=COLORS["blue"],
-                                   font=("Segoe UI Semibold", 8), padx=9, pady=5)
-    app.edit_mode_label.pack(side="right")
 
     date_time = ttk.Frame(shell, style="Card.TFrame")
     date_time.grid(row=1, column=0, sticky="ew")
@@ -94,8 +91,8 @@ def _build_daily_input(app, parent: tk.Frame) -> None:
     app.start_time_var = tk.StringVar(value="16:00")
     app.end_time_var = tk.StringVar(value="18:00")
     _combo_field(app, date_time, "Tanggal lembur", app.overtime_date_var, 0)
-    app.start_time_entry = _entry_field(app, date_time, "Jam mulai (contoh 1600)", app.start_time_var, 1)
-    app.end_time_entry = _entry_field(app, date_time, "Jam selesai (contoh 1800)", app.end_time_var, 2)
+    app.start_time_entry = _entry_field(app, date_time, "Jam mulai", app.start_time_var, 1)
+    app.end_time_entry = _entry_field(app, date_time, "Jam selesai", app.end_time_var, 2)
     for entry, variable in ((app.start_time_entry, app.start_time_var), (app.end_time_entry, app.end_time_var)):
         entry.bind("<KeyRelease>", lambda _event, var=variable: app._format_time_as_typed(var))
         entry.bind("<FocusOut>", lambda _event, var=variable: app._normalize_time_var(var))
