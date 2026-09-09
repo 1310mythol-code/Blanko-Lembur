@@ -869,7 +869,7 @@ class BlankoLemburApp(tk.Tk):
 
         self.overtime_date_var = tk.StringVar()
         self.start_time_var = tk.StringVar(value="16:00")
-        self.end_time_var = tk.StringVar(value="20:00")
+        self.end_time_var = tk.StringVar(value="18:00")
         self._combo_field(date_time, "Tanggal lembur", self.overtime_date_var, 0)
         self.start_time_entry = self._entry_field(date_time, "Jam mulai (contoh 1600)", self.start_time_var, 1)
         self.end_time_entry = self._entry_field(date_time, "Jam selesai (contoh 2000)", self.end_time_var, 2)
@@ -1382,7 +1382,7 @@ class BlankoLemburApp(tk.Tk):
         self.editing_item_index = None
         self.draft_items = []
         self.start_time_var.set("16:00")
-        self.end_time_var.set("20:00")
+        self.end_time_var.set("18:00")
         self.blanko_error.configure(text="")
         self._clear_item_editor()
         self._refresh_draft_tree()

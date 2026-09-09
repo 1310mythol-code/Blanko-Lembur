@@ -132,17 +132,17 @@ def format_duration(minutes: int) -> str:
 
 @dataclass
 class Profile:
-    nama: str = "Nur Almito Muslindra"
+    nama: str = ""
     nip: str = ""
-    unit_kerja: str = "Tim Kerja Akuntansi dan BMN"
+    unit_kerja: str = ""
     bulan: str = field(default_factory=current_period_label)
 
 
 @dataclass
 class Officials:
-    nama_manager: str = "Suhatsyah, SE, MM, CPIA"
+    nama_manager: str = ""
     nip_manager: str = ""
-    nama_asmen: str = "Rahma Devi, SE. MM"
+    nama_asmen: str = ""
     nip_asmen: str = ""
     manager_unit_override: str = ""
     asmen_unit_override: str = ""
