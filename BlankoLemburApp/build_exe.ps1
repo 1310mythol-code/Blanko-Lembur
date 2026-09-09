@@ -16,14 +16,37 @@ if (-not (Test-Path -LiteralPath $buildPython)) {
 & $buildPython -m pip install --disable-pip-version-check 'pyinstaller==6.22.2' 'cryptography==50.0.1'
 if ($LASTEXITCODE -ne 0) { throw 'Gagal memasang PyInstaller.' }
 
-& $buildPython -c 'import tkinter; root = tkinter.Tk(); root.withdraw(); root.update_idletasks(); root.destroy()'
-if ($LASTEXITCODE -ne 0) { throw 'Tcl/Tk tidak dapat digunakan. Periksa instalasi Python atau izin lingkungan build.' }
+$pythonRoot = (& $buildPython -c 'import sys; print(sys.base_prefix)').Trim()
+$tclData = Join-Path $pythonRoot 'tcl\tcl8.6'
+$tkData = Join-Path $pythonRoot 'tcl\tk8.6'
+$tkinterBinary = Join-Path $pythonRoot 'DLLs\_tkinter.pyd'
+$tclBinary = Join-Path $pythonRoot 'DLLs\tcl86t.dll'
+$tkBinary = Join-Path $pythonRoot 'DLLs\tk86t.dll'
+$zlibBinary = Join-Path $pythonRoot 'DLLs\zlib1.dll'
+$runtimeHook = Join-Path $buildDir 'venv\Lib\site-packages\PyInstaller\hooks\rthooks\pyi_rth__tkinter.py'
+$customHooks = Join-Path $appDir 'packaging\pyinstaller_hooks'
+foreach ($path in @($tclData, $tkData, $tkinterBinary, $tclBinary, $tkBinary, $zlibBinary, $runtimeHook, $customHooks)) {
+    if (-not (Test-Path -LiteralPath $path)) { throw "Komponen Tkinter tidak ditemukan: $path" }
+}
+
+# Some Python installations have all Tcl/Tk runtime files but cannot open a
+# local Tk window during the build. Bundle those verified files explicitly.
+& $buildPython -c 'import _tkinter'
+if ($LASTEXITCODE -ne 0) { throw 'Modul _tkinter tidak dapat dimuat.' }
 
 $env:PYINSTALLER_CONFIG_DIR = Join-Path $buildDir 'cache'
 & $buildPython -m PyInstaller --noconfirm --clean --onefile --windowed --noupx `
     --name 'Blanko Lembur Otomatis' `
+    --additional-hooks-dir $customHooks `
+    --runtime-hook $runtimeHook `
     --add-data ((Join-Path $appDir 'blanko_template.docx') + ':.') `
     --add-data ((Join-Path $appDir 'REKAP LEMBUR BULAN.docx') + ':.') `
+    --add-data ($tclData + ':_tcl_data') `
+    --add-data ($tkData + ':_tk_data') `
+    --add-binary ($tkinterBinary + ':.') `
+    --add-binary ($tclBinary + ':.') `
+    --add-binary ($tkBinary + ':.') `
+    --add-binary ($zlibBinary + ':.') `
     --distpath $OutputDirectory --workpath (Join-Path $buildDir 'work') `
     --specpath $buildDir (Join-Path $appDir 'blanko_lembur.py')
 if ($LASTEXITCODE -ne 0) { throw 'Pembuatan EXE gagal.' }

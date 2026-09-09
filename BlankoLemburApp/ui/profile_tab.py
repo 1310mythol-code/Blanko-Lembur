@@ -77,7 +77,7 @@ def build(app) -> None:
              font=("Segoe UI Semibold", 8)).pack(anchor="w")
     tk.Label(aside, text="Satu profil untuk\nsemua blanko", bg=COLORS["surface_alt"], fg=COLORS["ink"],
              font=("Segoe UI Semibold", 18), justify="left").pack(anchor="w", pady=(8, 18))
-    for text in ("Nama dan NIP pegawai", "Unit kerja", "Bulan dan tahun aktif", "Filter rekap bulanan"):
+    for text in ("Nama dan NIP pegawai", "Unit kerja", "Bulan dan tahun lembur", "Filter rekap bulanan"):
         row = tk.Frame(aside, bg=COLORS["surface_alt"])
         row.pack(fill="x", pady=7)
         tk.Label(row, text="●", bg=COLORS["surface_alt"], fg=COLORS["blue"],

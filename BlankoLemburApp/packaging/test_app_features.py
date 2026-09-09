@@ -122,7 +122,7 @@ class AppFeaturesTests(unittest.TestCase):
         labels = widget_texts(self.app.info_tab)
         for expected in (
             "Aplikasi Ini dibuat oleh NAM",
-            "Versi aplikasi: 1.0",
+            "Versi aplikasi: 1.1.1",
             "Aplikasi ini dibuat untuk pegawai RSUP Dr M Djamil",
             "Cek untuk Update",
         ):
@@ -161,34 +161,28 @@ class AppFeaturesTests(unittest.TestCase):
                 self.assertEqual(self.app.store.officials_path.read_bytes(), expected_data)
                 field.set("")
 
-    def test_official_titles_follow_unit_change_and_saved_profile(self):
+    def test_official_titles_are_editable_independently_from_profile(self):
         self.save_complete_profile()
         self.app.profile_unit_var.set("  Instalasi Farmasi & Pelayanan  ")
         self.assertEqual(
             str(self.app.manager_title_label.cget("text")),
-            "Manajer Instalasi Farmasi & Pelayanan",
+            "Manajer Instalasi Gizi",
         )
         self.assertEqual(
             str(self.app.asmen_title_label.cget("text")),
-            "Asisten Manajer Instalasi Farmasi & Pelayanan",
+            "Asisten Manajer Instalasi Gizi",
         )
         self.app._save_profile()
         self.assertEqual(self.app.store.load_profile().unit_kerja, "Instalasi Farmasi & Pelayanan")
 
-    def test_manual_roles_are_independent_persist_and_can_follow_unit_again(self):
+    def test_manual_roles_are_always_editable_and_persist(self):
         self.save_complete_profile()
         self.save_officials_without_nips()
-        for manual, follow, entry, label, other_label, override_name, prefix in (
-            (self.app.manager_role_var, self.app.manager_follow_unit_var,
-             self.app.manager_role_entry, self.app.manager_title_label,
-             self.app.asmen_title_label, "manager_unit_override", "Manajer"),
-            (self.app.asmen_role_var, self.app.asmen_follow_unit_var,
-             self.app.asmen_role_entry, self.app.asmen_title_label,
-             self.app.manager_title_label, "asmen_unit_override", "Asisten Manajer"),
+        for role_name, manual, entry, override_name in (
+            ("Manajer", self.app.manager_role_var, self.app.manager_role_entry, "manager_unit_override"),
+            ("Asisten Manajer", self.app.asmen_role_var, self.app.asmen_role_entry, "asmen_unit_override"),
         ):
-            with self.subTest(role=prefix):
-                self.assertEqual(str(entry.cget("state")), "readonly")
-                follow.set(False)
+            with self.subTest(role=role_name):
                 self.assertEqual(str(entry.cget("state")), "normal")
                 manual.set("  Pelayanan & Operasional  ")
                 self.assertTrue(self.app._has_unsaved_update_input())
@@ -198,34 +192,20 @@ class AppFeaturesTests(unittest.TestCase):
                 self.assertEqual(getattr(stored, override_name), "Pelayanan & Operasional")
                 self.app.officials = stored
                 self.app._load_forms()
-                self.assertFalse(follow.get())
                 self.assertEqual(manual.get(), "Pelayanan & Operasional")
-                self.app.profile_unit_var.set("Unit Baru")
-                self.assertEqual(str(label.cget("text")), f"{prefix} Pelayanan & Operasional")
-                self.assertTrue(str(other_label.cget("text")).endswith("Unit Baru"))
-                self.app._save_profile()
-                self.assertFalse(self.app._has_unsaved_update_input())
-                follow.set(True)
-                self.assertEqual(manual.get(), "Unit Baru")
-                self.app._save_officials()
-                self.assertEqual(getattr(self.app.store.load_officials(), override_name), "")
-                self.app.officials = self.app.store.load_officials()
-                self.app._load_forms()
-                self.assertTrue(follow.get())
 
     def test_empty_manual_role_is_rejected_without_overwriting_saved_officials(self):
         self.save_complete_profile()
         self.save_officials_without_nips()
         original = self.app.store.officials_path.read_bytes()
-        for follow, role in (
-            (self.app.manager_follow_unit_var, self.app.manager_role_var),
-            (self.app.asmen_follow_unit_var, self.app.asmen_role_var),
+        for role in (
+            self.app.manager_role_var,
+            self.app.asmen_role_var,
         ):
             with self.subTest(role=str(role)):
-                follow.set(False)
                 role.set("   ")
                 self.app._save_officials()
-                self.assertIn("manual", str(self.app.officials_error.cget("text")))
+                self.assertIn("wajib diisi", str(self.app.officials_error.cget("text")))
                 self.assertTrue(self.app._has_unsaved_update_input())
                 self.assertEqual(self.app.store.officials_path.read_bytes(), original)
                 self.app._load_forms()
@@ -237,7 +217,6 @@ class AppFeaturesTests(unittest.TestCase):
         self.assertEqual(str(self.app.recap_button.cget("state")), "disabled")
         self.save_complete_profile()
         self.save_officials_without_nips()
-        self.app.manager_follow_unit_var.set(False)
         self.app.manager_role_var.set("Keuangan & Perencanaan")
         self.app._save_officials()
         self.save_daily_records()
@@ -289,7 +268,7 @@ class AppFeaturesTests(unittest.TestCase):
         mutations = (
             lambda: self.app.profile_unit_var.set("Perubahan belum disimpan"),
             lambda: self.app.manager_name_var.set("Nama baru"),
-            lambda: self.app.asmen_follow_unit_var.set(False),
+            lambda: self.app.asmen_role_var.set("Jabatan baru belum disimpan"),
             lambda: self.app.job_var.set("Pekerjaan belum disimpan"),
             lambda: self.app.draft_items.append(JobItem("Draf", "1")),
             lambda: setattr(self.app, "editing_record_id", "september-1"),

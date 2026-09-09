@@ -591,7 +591,7 @@ class BlankoLemburApp(tk.Tk):
         self.manager_title_label.pack(anchor="w")
         self.manager_role_entry = self._role_input_row(form, 1, self.manager_follow_unit_var, self.manager_role_var)
         self._labeled_entry(form, "Nama manajer", self.manager_name_var, 2, 0)
-        self._labeled_entry(form, "NIP manajer (opsional)", self.manager_nip_var, 2, 1)
+        self._labeled_entry(form, "NIP manajer", self.manager_nip_var, 2, 1)
 
         asmen_header = tk.Frame(form, bg=COLORS["surface_alt"], padx=14, pady=10)
         asmen_header.grid(row=3, column=0, columnspan=2, sticky="ew", padx=7, pady=(10, 6))
@@ -607,7 +607,7 @@ class BlankoLemburApp(tk.Tk):
         self.asmen_title_label.pack(anchor="w")
         self.asmen_role_entry = self._role_input_row(form, 4, self.asmen_follow_unit_var, self.asmen_role_var)
         self._labeled_entry(form, "Nama asisten manajer", self.asmen_name_var, 5, 0)
-        self._labeled_entry(form, "NIP asisten manajer (opsional)", self.asmen_nip_var, 5, 1)
+        self._labeled_entry(form, "NIP asisten manajer", self.asmen_nip_var, 5, 1)
 
         self.officials_error = ttk.Label(form, text="", style="Error.TLabel")
         self.officials_error.grid(row=6, column=0, columnspan=2, sticky="w", padx=7, pady=(10, 0))
@@ -633,14 +633,11 @@ class BlankoLemburApp(tk.Tk):
         return entry
 
     def _refresh_officials_titles(self, *_args) -> None:
-        unit = self.profile_unit_var.get().strip()
-        for follow, value, entry, label, prefix in (
-            (self.manager_follow_unit_var, self.manager_role_var, self.manager_role_entry, self.manager_title_label, "Manajer"),
-            (self.asmen_follow_unit_var, self.asmen_role_var, self.asmen_role_entry, self.asmen_title_label, "Asisten Manajer"),
+        for value, entry, label, prefix in (
+            (self.manager_role_var, self.manager_role_entry, self.manager_title_label, "Manajer"),
+            (self.asmen_role_var, self.asmen_role_entry, self.asmen_title_label, "Asisten Manajer"),
         ):
-            if follow.get() and value.get() != unit:
-                value.set(unit)
-            entry.configure(state="readonly" if follow.get() else "normal")
+            entry.configure(state="normal")
             label.configure(text=f"{prefix} {value.get().strip()}".strip())
 
     def _legacy_build_info_tab(self) -> None:
@@ -743,10 +740,10 @@ class BlankoLemburApp(tk.Tk):
             (self.asmen_nip_var, self.officials.nip_asmen),
         )
         role_changed = (
-            ("" if self.manager_follow_unit_var.get() else self.manager_role_var.get().strip()) != self.officials.manager_unit_override
-            or ("" if self.asmen_follow_unit_var.get() else self.asmen_role_var.get().strip()) != self.officials.asmen_unit_override
-            or (not self.manager_follow_unit_var.get() and not self.manager_role_var.get().strip())
-            or (not self.asmen_follow_unit_var.get() and not self.asmen_role_var.get().strip())
+            self.manager_role_var.get().strip() != (self.officials.manager_unit_override or self.profile.unit_kerja).strip()
+            or self.asmen_role_var.get().strip() != (self.officials.asmen_unit_override or self.profile.unit_kerja).strip()
+            or not self.manager_role_var.get().strip()
+            or not self.asmen_role_var.get().strip()
         )
         return bool(role_changed or self.draft_items or self.editing_record_id or
                     any(var.get().strip() != value.strip() for var, value in fields) or
@@ -1078,8 +1075,6 @@ class BlankoLemburApp(tk.Tk):
         self.manager_nip_var.set(self.officials.nip_manager)
         self.asmen_name_var.set(self.officials.nama_asmen)
         self.asmen_nip_var.set(self.officials.nip_asmen)
-        self.manager_follow_unit_var.set(not bool(self.officials.manager_unit_override))
-        self.asmen_follow_unit_var.set(not bool(self.officials.asmen_unit_override))
         self.manager_role_var.set(self.officials.manager_unit_override or self.profile.unit_kerja)
         self.asmen_role_var.set(self.officials.asmen_unit_override or self.profile.unit_kerja)
         self._refresh_officials_titles()
@@ -1133,20 +1128,18 @@ class BlankoLemburApp(tk.Tk):
             self.officials_error.configure(text="NIP harus berisi angka atau dikosongkan untuk pejabat non-ASN.")
             return
 
-        manager_override = "" if self.manager_follow_unit_var.get() else self.manager_role_var.get().strip()
-        asmen_override = "" if self.asmen_follow_unit_var.get() else self.asmen_role_var.get().strip()
-        if ((not self.manager_follow_unit_var.get() and not manager_override) or
-                (not self.asmen_follow_unit_var.get() and not asmen_override)):
-            self.officials_error.configure(text="Isi nama bidang/unit jabatan manual atau pilih Gunakan Unit Kerja.")
+        manager_role = self.manager_role_var.get().strip()
+        asmen_role = self.asmen_role_var.get().strip()
+        if not manager_role or not asmen_role:
+            self.officials_error.configure(text="Bidang/unit jabatan manajer dan asisten manajer wajib diisi.")
             return
-
         self.officials = Officials(
             nama_manager=manager_name,
             nip_manager=manager_nip,
             nama_asmen=asmen_name,
             nip_asmen=asmen_nip,
-            manager_unit_override=manager_override,
-            asmen_unit_override=asmen_override,
+            manager_unit_override=manager_role,
+            asmen_unit_override=asmen_role,
         )
         self.store.save_officials(self.officials)
         self.manager_nip_var.set(manager_nip)

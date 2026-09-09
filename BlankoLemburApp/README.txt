@@ -24,8 +24,8 @@ ALUR PENGGUNAAN
 1. Buka tab Profil, lengkapi Nama, NIP, Unit Kerja, Bulan, dan Tahun.
 2. Buka tab Pejabat, lengkapi nama Manajer dan Asisten Manajer.
    NIP keduanya opsional dan boleh kosong untuk pejabat non-ASN.
-   Untuk setiap jabatan, centang "Gunakan Unit Kerja" agar mengikuti Profil.
-   Hilangkan centang untuk mengetik akhiran jabatan manual, lalu simpan.
+   Nilai awal bidang/unit jabatan mengikuti Unit Kerja dari Profil, tetapi
+   kolomnya selalu bisa langsung diganti manual, lalu simpan.
    Contoh: Manajer Pelayanan dan Asisten Manajer Keperawatan.
 3. Buka tab Blanko Lembur.
 4. Pilih tanggal dan isi jam mulai serta jam selesai.
@@ -86,7 +86,7 @@ di Microsoft Word, lalu coba lagi.
 
 INFO APLIKASI DAN PEMBARUAN
 --------------------------
-Versi aplikasi: 1.0. Dibuat oleh NAM untuk pegawai RSUP Dr M Djamil.
+Versi aplikasi: 1.1.1. Dibuat oleh NAM untuk pegawai RSUP Dr M Djamil.
 Tab Info aplikasi memuat tombol "Cek untuk Update".
 Tombol memeriksa rilis resmi di repository GitHub Blanko-Lembur. Jika belum
 ada rilis baru, aplikasi menjelaskan bahwa versi saat ini sudah terbaru.
