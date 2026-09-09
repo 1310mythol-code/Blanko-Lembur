@@ -662,7 +662,7 @@ class BlankoLemburApp(tk.Tk):
         self.install_update_button = ttk.Button(actions, text="Unduh & Perbarui", style="Success.TButton",
                                                 command=self._download_available_update)
         self.update_status_var = tk.StringVar(value=(
-            "Periksa apakah versi aplikasi terbaru sudah tersedia." if updater.is_configured()
+            "Siap memeriksa pembaruan resmi melalui GitHub." if updater.is_configured()
             else "Pembaruan online belum diaktifkan. Aplikasi tetap dapat digunakan."
         ))
         tk.Label(card, textvariable=self.update_status_var, bg=COLORS["surface_alt"],
@@ -720,7 +720,9 @@ class BlankoLemburApp(tk.Tk):
         self._downloaded_update = None
         self.install_update_button.pack_forget()
         if release is None:
-            self.update_status_var.set(f"Versi {APP_VERSION} sudah merupakan versi terbaru.")
+            self.update_status_var.set(
+                f"Versi {APP_VERSION} sudah terbaru. Belum ada pembaruan baru di GitHub."
+            )
             return
         notes = release.notes[:1200] + ("…" if len(release.notes) > 1200 else "")
         self.update_status_var.set(f"Versi {release.version} tersedia.\n{notes}")

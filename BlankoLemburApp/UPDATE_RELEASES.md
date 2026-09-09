@@ -1,36 +1,31 @@
 # Pembaruan aplikasi melalui internet
 
 Versi 1.0 sudah menyediakan tab **Info aplikasi** dan tombol **Cek untuk Update**.
-Karena repository belum dibuat, sumber pembaruan dan kunci publik dikosongkan.
-Tombol menjelaskan bahwa layanan belum aktif; aplikasi tetap dapat digunakan offline.
+Sumber pembaruan diarahkan ke repository publik `1310mythol-code/Blanko-Lembur`.
+Jika repository belum mempunyai Release, tombol menjelaskan bahwa belum ada update.
 Tidak ada data pegawai atau lembur yang dikirim ke layanan pembaruan.
 
-## Mengaktifkan layanan nanti
+## Konfigurasi yang digunakan
 
-1. Buat repository GitHub untuk rilis aplikasi. Gunakan repository publik apabila pengguna
-   mengunduh tanpa akun; kode sumber tidak harus disimpan di repository rilis tersebut.
+1. Repository harus tetap publik agar pengguna dapat mengunduh tanpa akun.
    Jangan menaruh token GitHub atau kata sandi di dalam EXE.
-2. Di komputer pengembang, gunakan lingkungan Python build yang sudah memiliki `cryptography`.
-   Jalankan contoh berikut dengan jalur penyimpanan kunci privat milik pengembang:
+2. Kunci privat pengembang disimpan di luar repository dan dilindungi akun Windows:
 
    ```powershell
-   & 'JALUR_PYTHON_BUILD' packaging\publish_update.py keygen --private-key 'D:\KunciPribadi\blanko-update.pem'
+   %LOCALAPPDATA%\BlankoLemburOtomatisDeveloper\update-signing-key.dpapi
    ```
 
-   Masukkan kata sandi yang kuat dan simpan kunci serta kata sandinya dengan aman. Kunci
-   privat dienkripsi dan hanya digunakan untuk menandatangani rilis. Kunci privat tidak
-   boleh masuk repository, folder distribusi, atau paket EXE.
-3. Salin nilai `UPDATE_PUBLIC_KEY` yang ditampilkan ke `app_metadata.py`. Isi
-   `UPDATE_MANIFEST_URL` dengan alamat tetap, misalnya:
+   Berkas tersebut hanya dapat dibuka oleh akun Windows yang membuatnya. Cadangkan profil
+   Windows pengembang. Kehilangan kunci membuat EXE lama tidak dapat menerima rilis baru.
+   Kunci privat tidak boleh masuk repository, folder distribusi, atau paket EXE.
+3. `UPDATE_PUBLIC_KEY` dan `UPDATE_MANIFEST_URL` sudah ditanam di `app_metadata.py`:
 
    ```text
-   https://github.com/AKUN/REPOSITORY/releases/latest/download/update.json
+   https://github.com/1310mythol-code/Blanko-Lembur/releases/latest/download/update.json
    ```
 
-4. Buat ulang dan uji EXE, lalu bagikan satu kali secara manual kepada pengguna.
-   **EXE 1.0 yang alamatnya masih kosong tidak dapat menemukan repository baru sendiri.**
-   Setelah EXE yang sudah berisi alamat dan kunci publik dipasang, rilis selanjutnya
-   dapat diperiksa dan dipasang melalui tombol di aplikasi.
+4. Bagikan EXE 1.0 yang sudah berisi alamat dan kunci publik. Rilis selanjutnya dapat
+   diperiksa dan dipasang melalui tombol di aplikasi.
 
 ## Menyiapkan rilis berikutnya
 
@@ -43,10 +38,10 @@ Tidak ada data pegawai atau lembur yang dikirim ke layanan pembaruan.
 
    ```powershell
    & 'JALUR_PYTHON_BUILD' packaging\publish_update.py sign `
-       --private-key 'D:\KunciPribadi\blanko-update.pem' `
+       --private-key "$env:LOCALAPPDATA\BlankoLemburOtomatisDeveloper\update-signing-key.dpapi" `
        --exe '..\Blanko Lembur Otomatis.exe' `
        --version '1.1' `
-       --url 'https://github.com/AKUN/REPOSITORY/releases/download/v1.1/BlankoLemburOtomatis.exe' `
+       --url 'https://github.com/1310mythol-code/Blanko-Lembur/releases/download/v1.1/BlankoLemburOtomatis.exe' `
        --notes-file 'catatan-rilis.txt' `
        --output 'update.json'
    ```

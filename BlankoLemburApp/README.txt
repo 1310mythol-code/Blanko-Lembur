@@ -88,14 +88,12 @@ INFO APLIKASI DAN PEMBARUAN
 --------------------------
 Versi aplikasi: 1.0. Dibuat oleh NAM untuk pegawai RSUP Dr M Djamil.
 Tab Info aplikasi memuat tombol "Cek untuk Update".
-Layanan pembaruan online belum diaktifkan karena alamat rilis belum disiapkan.
-Saat ini tombol akan menjelaskan status tersebut, tanpa menghubungi internet.
-Setelah layanan diaktifkan, tombol dapat memeriksa versi terbaru, mengunduh
-pembaruan yang terverifikasi, dan memasangnya setelah pengguna menyimpan
-pekerjaan serta menyetujui penutupan aplikasi. Data CSV tetap disimpan lokal.
+Tombol memeriksa rilis resmi di repository GitHub Blanko-Lembur. Jika belum
+ada rilis baru, aplikasi menjelaskan bahwa versi saat ini sudah terbaru.
+Jika versi baru tersedia, aplikasi mengunduh pembaruan yang terverifikasi dan
+memasangnya setelah pengguna menyimpan pekerjaan serta menyetujui penutupan.
+Data CSV tetap disimpan lokal.
 Internet hanya dibutuhkan saat memeriksa atau mengunduh pembaruan.
-Aktivasi pertama memerlukan pengisian sumber rilis dan kunci publik dalam
-app_metadata.py, lalu pembagian EXE hasil build tersebut sekali lagi.
 Panduan penerbitan untuk pengembang tersedia di UPDATE_RELEASES.md.
 
 UNTUK PENGEMBANG

@@ -1,8 +1,10 @@
-﻿{
+{
     "Version":  "1.0",
-    "TestsPassed":  37,
+    "TestsPassed":  59,
     "FrozenGuiAndWordTest":  "PASS",
-    "UpdateService":  "Not configured",
-    "OriginalCsvAndTemplate":  "Unchanged",
-    "Sha256":  "be8d06334333827c6e9d8454ee61d654b9580f43bce6857adcff46fe730442a3"
+    "UpdateService":  "GitHub configured; first Release not published",
+    "UserCsvPreservedDuringBuild":  true,
+    "OriginalDailyTemplate":  "Unchanged",
+    "MonthlyTemplateVisualQA":  "PASS",
+    "Sha256":  "5ddf86f89dabe9ceb31b9cdf437ce0b0c9113550c235862f4215ad6ad2906dce"
 }

@@ -1,8 +1,12 @@
 {
-  "status": "PASS",
-  "two_dates": true,
-  "seven_job_rows": true,
-  "xml_special_characters": true,
-  "template_assets_preserved": true,
-  "note": "Direct core generation check; separate EXE GUI check required."
+    "status":  "PASS",
+    "daily_recap":  true,
+    "monthly_recap":  true,
+    "one_row_per_job":  true,
+    "repeated_date_and_time":  true,
+    "manual_and_unit_roles":  true,
+    "optional_official_nips":  true,
+    "no_monthly_highlights":  true,
+    "template_assets_preserved":  true,
+    "note":  "Direct generation and frozen EXE GUI checks passed."
 }

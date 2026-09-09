@@ -3,6 +3,8 @@ from __future__ import annotations
 
 import argparse
 import base64
+import ctypes
+from ctypes import wintypes
 import getpass
 import hashlib
 import json
@@ -15,6 +17,60 @@ from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 
 from updater import MAX_EXE_BYTES, _digest, _https_url, _version, canonical_payload
+
+DPAPI_MAGIC = b"BLOUKEY1\x00"
+
+
+class _DataBlob(ctypes.Structure):
+    _fields_ = (("size", wintypes.DWORD), ("data", ctypes.POINTER(ctypes.c_ubyte)))
+
+
+def _blob(data: bytes):
+    buffer = (ctypes.c_ubyte * len(data)).from_buffer_copy(data)
+    return _DataBlob(len(data), buffer), buffer
+
+
+def _dpapi_protect(data: bytes) -> bytes:
+    if sys.platform != "win32":
+        raise RuntimeError("Penyimpanan kunci Windows hanya tersedia pada Windows.")
+    source, source_buffer = _blob(data)
+    protected = _DataBlob()
+    crypt32 = ctypes.WinDLL("crypt32", use_last_error=True)
+    kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
+    if not crypt32.CryptProtectData(
+        ctypes.byref(source), "Blanko Lembur update signing key", None, None, None,
+        0x01, ctypes.byref(protected),
+    ):
+        raise ctypes.WinError(ctypes.get_last_error())
+    try:
+        return ctypes.string_at(protected.data, protected.size)
+    finally:
+        kernel32.LocalFree(protected.data)
+        del source_buffer
+
+
+def _dpapi_unprotect(data: bytes) -> bytes:
+    source, source_buffer = _blob(data)
+    plain = _DataBlob()
+    crypt32 = ctypes.WinDLL("crypt32", use_last_error=True)
+    kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
+    if not crypt32.CryptUnprotectData(
+        ctypes.byref(source), None, None, None, None, 0x01, ctypes.byref(plain),
+    ):
+        raise ctypes.WinError(ctypes.get_last_error())
+    try:
+        return ctypes.string_at(plain.data, plain.size)
+    finally:
+        kernel32.LocalFree(plain.data)
+        del source_buffer
+
+
+def _load_private_key(path: Path):
+    encoded = path.read_bytes()
+    if encoded.startswith(DPAPI_MAGIC):
+        return serialization.load_der_private_key(_dpapi_unprotect(encoded[len(DPAPI_MAGIC):]), password=None)
+    password = getpass.getpass("Kata sandi kunci privat: ").encode("utf-8")
+    return serialization.load_pem_private_key(encoded, password=password)
 
 
 def main() -> None:
@@ -34,17 +90,29 @@ def main() -> None:
     if args.command == "keygen":
         if args.private_key.exists():
             parser.error("Berkas kunci sudah ada; tidak ditimpa.")
-        password = getpass.getpass("Kata sandi baru untuk kunci privat (minimal 12 karakter): ")
-        if len(password) < 12 or password != getpass.getpass("Ulangi kata sandi: "):
-            parser.error("Kata sandi harus cocok dan minimal 12 karakter.")
         private = Ed25519PrivateKey.generate()
-        encoded = private.private_bytes(serialization.Encoding.PEM, serialization.PrivateFormat.PKCS8,
-                                        serialization.BestAvailableEncryption(password.encode("utf-8")))
+        if args.private_key.suffix.lower() == ".dpapi":
+            raw = private.private_bytes(
+                serialization.Encoding.DER, serialization.PrivateFormat.PKCS8,
+                serialization.NoEncryption(),
+            )
+            encoded = DPAPI_MAGIC + _dpapi_protect(raw)
+        else:
+            password = getpass.getpass("Kata sandi baru untuk kunci privat (minimal 12 karakter): ")
+            if len(password) < 12 or password != getpass.getpass("Ulangi kata sandi: "):
+                parser.error("Kata sandi harus cocok dan minimal 12 karakter.")
+            encoded = private.private_bytes(
+                serialization.Encoding.PEM, serialization.PrivateFormat.PKCS8,
+                serialization.BestAvailableEncryption(password.encode("utf-8")),
+            )
         with args.private_key.open("xb") as output:
             output.write(encoded)
         public = private.public_key().public_bytes(serialization.Encoding.Raw, serialization.PublicFormat.Raw)
         print("UPDATE_PUBLIC_KEY = " + repr(base64.b64encode(public).decode("ascii")))
-        print("Simpan kunci privat dan kata sandinya secara aman. Jangan unggah atau sertakan dalam EXE.")
+        if args.private_key.suffix.lower() == ".dpapi":
+            print("Kunci privat dilindungi akun Windows. Jangan unggah atau sertakan dalam EXE.")
+        else:
+            print("Simpan kunci privat dan kata sandinya secara aman. Jangan unggah atau sertakan dalam EXE.")
         return
 
     _version(args.version)
@@ -59,8 +127,7 @@ def main() -> None:
     notes = args.notes_file.read_text(encoding="utf-8-sig") if args.notes_file else ""
     if len(notes) > 10000:
         parser.error("Catatan pembaruan maksimal 10.000 karakter.")
-    password = getpass.getpass("Kata sandi kunci privat: ").encode("utf-8")
-    private = serialization.load_pem_private_key(args.private_key.read_bytes(), password=password)
+    private = _load_private_key(args.private_key)
     if not isinstance(private, Ed25519PrivateKey):
         parser.error("Kunci privat harus Ed25519.")
     payload = {"version": args.version, "notes": notes, "url": args.url, "sha256": digest, "size": size}

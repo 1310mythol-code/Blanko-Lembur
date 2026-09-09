@@ -15,7 +15,7 @@ import time
 import uuid
 from dataclasses import dataclass, field
 from pathlib import Path
-from urllib.error import URLError
+from urllib.error import HTTPError, URLError
 from urllib.parse import urlsplit
 from urllib.request import HTTPRedirectHandler, Request, build_opener
 
@@ -145,6 +145,13 @@ def check_for_update() -> UpdateRelease | None:
             raw = b"".join(chunks)
         release = _parse_manifest(raw)
         return release if _version(release.version) > _version(app_metadata.APP_VERSION) else None
+    except HTTPError as exc:
+        # A new public repository can be configured before its first Release
+        # exists. Treat that normal state as "no update" instead of showing a
+        # network failure to users.
+        if exc.code == 404:
+            return None
+        raise UpdateError("Tidak dapat memeriksa pembaruan. Layanan GitHub sedang tidak tersedia.") from exc
     except UpdateError:
         raise
     except (OSError, URLError, ValueError, HTTPException) as exc:

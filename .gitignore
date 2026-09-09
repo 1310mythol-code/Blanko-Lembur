@@ -5,6 +5,7 @@ BlankoLemburApp/.build/
 # Local verification and generated work artifacts
 .packaging-verification/
 .recap-work/
+.release-work/
 
 # Python cache and test artifacts
 __pycache__/

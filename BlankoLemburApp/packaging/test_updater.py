@@ -12,7 +12,7 @@ import unittest
 from dataclasses import replace
 from pathlib import Path
 from unittest.mock import Mock, patch
-from urllib.error import URLError
+from urllib.error import HTTPError, URLError
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
@@ -135,6 +135,15 @@ class UpdaterTests(unittest.TestCase):
         with patch.object(updater, "_open", side_effect=URLError("offline")):
             with self.assertRaisesRegex(updater.UpdateError, "koneksi internet"):
                 updater.check_for_update()
+
+    def test_missing_first_github_release_means_no_update(self):
+        def missing_release(_url):
+            raise HTTPError(
+                app_metadata.UPDATE_MANIFEST_URL, 404, "Not Found", {}, None
+            )
+
+        with patch.object(updater, "_open", side_effect=missing_release):
+            self.assertIsNone(updater.check_for_update())
 
     def test_good_download_has_manifest_and_verified_content(self):
         staged = self.stage()
