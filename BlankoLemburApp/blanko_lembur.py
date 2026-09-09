@@ -36,6 +36,10 @@ from core import (
     safe_filename,
     validate_record,
 )
+from ui.blanko_tab import build as build_blanko_tab_ui
+from ui.info_tab import build as build_info_tab_ui
+from ui.officials_tab import build as build_officials_tab_ui
+from ui.profile_tab import build as build_profile_tab_ui
 
 
 SOURCE_DIR = Path(__file__).resolve().parent
@@ -434,7 +438,7 @@ class BlankoLemburApp(tk.Tk):
         entry.pack(fill="x")
         return entry
 
-    def _build_profile_tab(self) -> None:
+    def _legacy_build_profile_tab(self) -> None:
         tab = self.profile_tab
         tab.columnconfigure(0, weight=3)
         tab.columnconfigure(1, weight=2)
@@ -544,7 +548,7 @@ class BlankoLemburApp(tk.Tk):
             wraplength=280,
         ).pack(anchor="w")
 
-    def _build_officials_tab(self) -> None:
+    def _legacy_build_officials_tab(self) -> None:
         tab = self.officials_tab
         tab.columnconfigure(0, weight=1)
         tab.rowconfigure(1, weight=1)
@@ -620,7 +624,7 @@ class BlankoLemburApp(tk.Tk):
                          self.manager_follow_unit_var, self.asmen_follow_unit_var):
             variable.trace_add("write", self._refresh_officials_titles)
 
-    def _role_input_row(self, parent, row, follow_variable, role_variable):
+    def _legacy_role_input_row(self, parent, row, follow_variable, role_variable):
         block = ttk.Frame(parent, style="Card.TFrame")
         block.grid(row=row, column=0, columnspan=2, sticky="ew", padx=7, pady=(0, 6))
         ttk.Checkbutton(block, text="Gunakan Unit Kerja", variable=follow_variable).pack(side="left", padx=(0, 16))
@@ -639,7 +643,7 @@ class BlankoLemburApp(tk.Tk):
             entry.configure(state="readonly" if follow.get() else "normal")
             label.configure(text=f"{prefix} {value.get().strip()}".strip())
 
-    def _build_info_tab(self) -> None:
+    def _legacy_build_info_tab(self) -> None:
         intro = self._section_intro(
             self.info_tab, "04", "Info aplikasi", "Tentang Blanko Lembur Otomatis dan pembaruan aplikasi.",
         )
@@ -784,7 +788,7 @@ class BlankoLemburApp(tk.Tk):
             return
         self.destroy()
 
-    def _metric_card(self, parent: ttk.Frame, column: int, label: str, color: str) -> tk.Label:
+    def _legacy_metric_card(self, parent: ttk.Frame, column: int, label: str, color: str) -> tk.Label:
         card = tk.Frame(
             parent,
             bg=COLORS["surface"],
@@ -810,7 +814,7 @@ class BlankoLemburApp(tk.Tk):
         value.pack(anchor="w", pady=(3, 0))
         return value
 
-    def _build_blanko_tab(self) -> None:
+    def _legacy_build_blanko_tab(self) -> None:
         tab = self.blanko_tab
         tab.columnconfigure(0, weight=1)
         tab.rowconfigure(1, weight=1)
@@ -833,7 +837,7 @@ class BlankoLemburApp(tk.Tk):
         self._build_daily_input(input_card)
         self._build_monthly_records(records_card)
 
-    def _build_daily_input(self, parent: tk.Frame) -> None:
+    def _legacy_build_daily_input(self, parent: tk.Frame) -> None:
         shell = ttk.Frame(parent, style="Card.TFrame", padding=16)
         shell.pack(fill="both", expand=True)
         shell.columnconfigure(0, weight=1)
@@ -953,7 +957,7 @@ class BlankoLemburApp(tk.Tk):
         self.save_blanko_button = ttk.Button(save_actions, text="Simpan blanko", style="Primary.TButton", command=self._save_blanko)
         self.save_blanko_button.pack(side="right")
 
-    def _entry_field(self, parent: ttk.Frame, label: str, variable: tk.StringVar, column: int) -> ttk.Entry:
+    def _legacy_entry_field(self, parent: ttk.Frame, label: str, variable: tk.StringVar, column: int) -> ttk.Entry:
         holder = ttk.Frame(parent, style="Card.TFrame")
         holder.grid(row=0, column=column, sticky="ew", padx=5)
         ttk.Label(holder, text=label, style="Card.TLabel", font=("Segoe UI Semibold", 9)).pack(anchor="w", pady=(0, 5))
@@ -961,7 +965,7 @@ class BlankoLemburApp(tk.Tk):
         entry.pack(fill="x")
         return entry
 
-    def _combo_field(self, parent: ttk.Frame, label: str, variable: tk.StringVar, column: int) -> ttk.Combobox:
+    def _legacy_combo_field(self, parent: ttk.Frame, label: str, variable: tk.StringVar, column: int) -> ttk.Combobox:
         holder = ttk.Frame(parent, style="Card.TFrame")
         holder.grid(row=0, column=column, sticky="ew", padx=5)
         ttk.Label(holder, text=label, style="Card.TLabel", font=("Segoe UI Semibold", 9)).pack(anchor="w", pady=(0, 5))
@@ -1000,7 +1004,7 @@ class BlankoLemburApp(tk.Tk):
         if iso_date:
             self.start_time_var.set(default_start_time(iso_date))
 
-    def _build_monthly_records(self, parent: tk.Frame) -> None:
+    def _legacy_build_monthly_records(self, parent: tk.Frame) -> None:
         shell = ttk.Frame(parent, style="Card.TFrame", padding=16)
         shell.pack(fill="both", expand=True)
         shell.columnconfigure(0, weight=1)
@@ -1516,6 +1520,21 @@ class BlankoLemburApp(tk.Tk):
 
     def _focus_daily_form(self) -> None:
         self.date_combo.focus_set()
+
+    # The tab layouts live in ui/*_tab.py. Keeping these small adapters here
+    # makes the application coordinator easy to read while preserving the
+    # existing callback and data model methods above.
+    def _build_profile_tab(self) -> None:
+        build_profile_tab_ui(self)
+
+    def _build_officials_tab(self) -> None:
+        build_officials_tab_ui(self)
+
+    def _build_blanko_tab(self) -> None:
+        build_blanko_tab_ui(self)
+
+    def _build_info_tab(self) -> None:
+        build_info_tab_ui(self)
 
 
 class PreviewDialog(tk.Toplevel):
