@@ -9,7 +9,6 @@ from ui.common import COLORS
 def _role_input_row(app, parent, row, follow_variable, role_variable):
     block = ttk.Frame(parent, style="Card.TFrame")
     block.grid(row=row, column=0, columnspan=2, sticky="ew", padx=7, pady=(0, 6))
-    ttk.Checkbutton(block, text="Gunakan Unit Kerja", variable=follow_variable).pack(side="left", padx=(0, 16))
     entry = ttk.Entry(block, textvariable=role_variable)
     entry.pack(side="left", fill="x", expand=True)
     return entry
@@ -68,7 +67,7 @@ def build(app) -> None:
     app.officials_error.grid(row=6, column=0, columnspan=2, sticky="w", padx=7, pady=(10, 0))
     action = ttk.Frame(form, style="Card.TFrame")
     action.grid(row=7, column=0, columnspan=2, sticky="ew", padx=7, pady=(10, 0))
-    ttk.Label(action, text="Hilangkan centang untuk mengisi nama bidang/unit jabatan secara manual.",
+    ttk.Label(action, text="Bidang/unit jabatan otomatis dari profil dan dapat diubah langsung.",
               style="Muted.Card.TLabel").pack(side="left")
     ttk.Button(action, text="Simpan Data Pejabat", style="Primary.TButton",
                command=app._save_officials).pack(side="right")

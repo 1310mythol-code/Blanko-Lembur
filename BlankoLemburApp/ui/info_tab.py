@@ -31,6 +31,11 @@ def build(app) -> None:
     app.check_update_button = ttk.Button(actions, text="Cek untuk Update", style="Primary.TButton",
                                          command=app._check_for_updates)
     app.check_update_button.pack(side="left")
+    app.publisher_email_button = ttk.Button(
+        actions, text="Kirim Email ke NAM", style="Secondary.TButton",
+        command=app._email_publisher,
+    )
+    app.publisher_email_button.pack(side="left", padx=(10, 0))
     app.install_update_button = ttk.Button(actions, text="Unduh & Perbarui", style="Success.TButton",
                                            command=app._download_available_update)
     app.update_status_var = tk.StringVar(value=(

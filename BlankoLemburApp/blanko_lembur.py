@@ -115,7 +115,6 @@ class BlankoLemburApp(tk.Tk):
         self._build_header()
         self._build_notebook()
         self._build_statusbar()
-        self.profile_unit_var.trace_add("write", self._refresh_officials_titles)
         self._load_forms()
         self._refresh_period_dependent_ui()
         self.notebook.select(self.blanko_tab)
@@ -615,7 +614,7 @@ class BlankoLemburApp(tk.Tk):
         action.grid(row=7, column=0, columnspan=2, sticky="ew", padx=7, pady=(10, 0))
         ttk.Label(
             action,
-            text="Hilangkan centang untuk mengisi nama bidang/unit jabatan secara manual.",
+            text="Bidang/unit jabatan otomatis dari profil dan dapat diubah langsung.",
             style="Muted.Card.TLabel",
         ).pack(side="left")
         ttk.Button(action, text="Simpan Data Pejabat", style="Primary.TButton", command=self._save_officials).pack(side="right")
@@ -627,10 +626,25 @@ class BlankoLemburApp(tk.Tk):
     def _legacy_role_input_row(self, parent, row, follow_variable, role_variable):
         block = ttk.Frame(parent, style="Card.TFrame")
         block.grid(row=row, column=0, columnspan=2, sticky="ew", padx=7, pady=(0, 6))
-        ttk.Checkbutton(block, text="Gunakan Unit Kerja", variable=follow_variable).pack(side="left", padx=(0, 16))
         entry = ttk.Entry(block, textvariable=role_variable)
         entry.pack(side="left", fill="x", expand=True)
         return entry
+
+    def _sync_official_units_from_profile(self, previous_unit: str) -> None:
+        unit = self.profile.unit_kerja.strip()
+        for variable in (self.manager_role_var, self.asmen_role_var):
+            if variable.get().strip() == previous_unit:
+                variable.set(unit)
+
+    def _email_publisher(self) -> None:
+        try:
+            os.startfile("mailto:Almito000@gmail.com")
+        except OSError:
+            messagebox.showerror(
+                "Email tidak dapat dibuka",
+                "Buka aplikasi email dan kirim pesan ke Almito000@gmail.com.",
+                parent=self,
+            )
 
     def _refresh_officials_titles(self, *_args) -> None:
         for value, entry, label, prefix in (
@@ -1107,8 +1121,10 @@ class BlankoLemburApp(tk.Tk):
             self.profile_error.configure(text="Bulan atau tahun tidak valid.")
             return
 
+        previous_unit = self.profile.unit_kerja.strip()
         self.profile = Profile(nama=name, nip=nip, unit_kerja=unit, bulan=period)
         self.store.save_profile(self.profile)
+        self._sync_official_units_from_profile(previous_unit)
         self.profile_nip_var.set(nip)
         self._refresh_period_dependent_ui()
         self._set_status("Profil dan periode berhasil disimpan.")
@@ -1138,8 +1154,8 @@ class BlankoLemburApp(tk.Tk):
             nip_manager=manager_nip,
             nama_asmen=asmen_name,
             nip_asmen=asmen_nip,
-            manager_unit_override=manager_role,
-            asmen_unit_override=asmen_role,
+            manager_unit_override="" if manager_role == self.profile.unit_kerja.strip() else manager_role,
+            asmen_unit_override="" if asmen_role == self.profile.unit_kerja.strip() else asmen_role,
         )
         self.store.save_officials(self.officials)
         self.manager_nip_var.set(manager_nip)
@@ -1327,6 +1343,9 @@ class BlankoLemburApp(tk.Tk):
         self._reset_blanko_form()
         self._refresh_records_tree()
         self._refresh_metrics()
+        self.records_tree.selection_set(record.blanko_id)
+        self.records_tree.focus(record.blanko_id)
+        self.records_tree.see(record.blanko_id)
         self._set_status(f"Blanko {saved_date} berhasil {'diperbarui' if was_edit else 'disimpan'}.")
 
     def _selected_record(self) -> OvertimeRecord | None:

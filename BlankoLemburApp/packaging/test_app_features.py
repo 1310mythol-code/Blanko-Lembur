@@ -122,7 +122,7 @@ class AppFeaturesTests(unittest.TestCase):
         labels = widget_texts(self.app.info_tab)
         for expected in (
             "Aplikasi Ini dibuat oleh NAM",
-            "Versi aplikasi: 1.1.1",
+            f"Versi aplikasi: {gui.APP_VERSION}",
             "Aplikasi ini dibuat untuk pegawai RSUP Dr M Djamil",
             "Cek untuk Update",
         ):
@@ -151,6 +151,7 @@ class AppFeaturesTests(unittest.TestCase):
         self.showwarning.assert_not_called()
 
     def test_invalid_nonempty_official_nip_rejected_without_data_change(self):
+        self.save_complete_profile()
         self.save_officials_without_nips()
         expected_data = self.app.store.officials_path.read_bytes()
         for field in (self.app.manager_nip_var, self.app.asmen_nip_var):
@@ -174,6 +175,48 @@ class AppFeaturesTests(unittest.TestCase):
         )
         self.app._save_profile()
         self.assertEqual(self.app.store.load_profile().unit_kerja, "Instalasi Farmasi & Pelayanan")
+        self.assertEqual(self.app.manager_role_var.get(), "Instalasi Farmasi & Pelayanan")
+        self.assertEqual(self.app.asmen_role_var.get(), "Instalasi Farmasi & Pelayanan")
+
+    def test_official_units_follow_profile_until_edited_manually(self):
+        self.save_complete_profile()
+        self.save_officials_without_nips()
+        self.assertNotIn("Gunakan Unit Kerja", widget_texts(self.app.officials_tab))
+        self.assertEqual(self.app.store.load_officials().manager_unit_override, "")
+        self.app.manager_role_var.set("Unit Khusus")
+        self.app._save_officials()
+        self.app.profile_unit_var.set("Unit Baru")
+        self.app._save_profile()
+        self.assertEqual(self.app.manager_role_var.get(), "Unit Khusus")
+        self.assertEqual(self.app.asmen_role_var.get(), "Unit Baru")
+        self.app.manager_role_var.set("Unit Baru")
+        self.app._save_officials()
+        self.app.profile_unit_var.set("Unit Berikutnya")
+        self.app._save_profile()
+        self.assertEqual(self.app.manager_role_var.get(), "Unit Berikutnya")
+
+    def test_added_items_appear_in_saved_records_and_can_be_edited(self):
+        self.save_complete_profile()
+        self.app.job_var.set("Laporan harian")
+        self.app.quantity_var.set("2")
+        self.app._add_or_update_item()
+        saved_date = self.app.date_display_to_iso[self.app.overtime_date_var.get()]
+        self.app._save_blanko()
+        self.assertEqual(str(self.app.blanko_error.cget("text")), "")
+        self.assertEqual(self.app.records_tree.get_children(), (saved_date,))
+        self.assertEqual(self.app.records_tree.selection(), (saved_date,))
+        self.assertEqual(self.app.store.load_records(), self.app.records)
+        self.assertEqual(self.app.draft_items, [])
+        self.assertEqual(str(self.app.metric_blanko.cget("text")), "1")
+        self.app._edit_selected_record()
+        self.assertEqual(self.app.job_var.get(), "")
+        self.assertEqual(self.app.draft_items[0].pekerjaan, "Laporan harian")
+        self.app.draft_items[0].pekerjaan = "Laporan diperbarui"
+        self.app._save_blanko()
+        self.assertEqual(self.app.store.load_records()[0].items[0].pekerjaan, "Laporan diperbarui")
+        self.app.records = self.app.store.load_records()
+        self.app._refresh_records_tree()
+        self.assertEqual(self.app.records_tree.get_children(), (saved_date,))
 
     def test_manual_roles_are_always_editable_and_persist(self):
         self.save_complete_profile()
@@ -312,6 +355,9 @@ class AppFeaturesTests(unittest.TestCase):
         self.assertFalse(self.app.install_update_button.winfo_manager())
 
     def test_unsaved_forms_prevent_download_and_install(self):
+        self.save_complete_profile()
+        self.save_officials_without_nips()
+        self.showinfo.reset_mock()
         self.assertFalse(self.app._has_unsaved_update_input())
         self.app._available_update = SimpleNamespace(version="1.1", notes="Fitur baru")
         self.patch(gui, "IS_FROZEN", True)

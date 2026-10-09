@@ -24,14 +24,17 @@ ALUR PENGGUNAAN
 1. Buka tab Profil, lengkapi Nama, NIP, Unit Kerja, Bulan, dan Tahun.
 2. Buka tab Pejabat, lengkapi nama Manajer dan Asisten Manajer.
    NIP keduanya opsional dan boleh kosong untuk pejabat non-ASN.
-   Nilai awal bidang/unit jabatan mengikuti Unit Kerja dari Profil, tetapi
+   Bidang/unit jabatan otomatis terisi setelah klik "Simpan Profil", tetapi
    kolomnya selalu bisa langsung diganti manual, lalu simpan.
+   Jabatan otomatis mengikuti perubahan Unit Kerja sampai diubah manual.
+   Untuk kembali otomatis, isi jabatan sama dengan Unit Kerja lalu simpan.
    Contoh: Manajer Pelayanan dan Asisten Manajer Keperawatan.
 3. Buka tab Blanko Lembur.
 4. Pilih tanggal dan isi jam mulai serta jam selesai.
 5. Isi Pekerjaan, Kuantitas, dan Keterangan, lalu klik
    "Tambah ke daftar". Maksimal tujuh pekerjaan per tanggal.
 6. Klik "Simpan blanko".
+   Data langsung muncul dan terpilih di daftar "Blanko tersimpan".
 7. Klik "Rekap Harian" untuk preview blanko per tanggal.
    Periksa preview, klik "Simpan sebagai Word", lalu pilih lokasi file.
 8. Setelah data harian selesai disimpan, klik "Rekap Bulanan".

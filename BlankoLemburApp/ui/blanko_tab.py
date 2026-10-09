@@ -78,6 +78,11 @@ def _build_daily_input(app, parent: tk.Frame) -> None:
     heading.grid(row=0, column=0, sticky="ew", pady=(0, 12))
     heading_copy = ttk.Frame(heading, style="Card.TFrame")
     heading_copy.pack(side="left", fill="x", expand=True)
+    app.edit_mode_label = tk.Label(
+        heading, text="BARU", bg=COLORS["soft_blue"], fg=COLORS["blue"],
+        font=("Segoe UI Semibold", 9), padx=10, pady=4,
+    )
+    app.edit_mode_label.pack(side="right")
     ttk.Label(heading_copy, text="Input blanko harian", style="Title.Card.TLabel").pack(anchor="w")
     ttk.Label(heading_copy, text="Pilih tanggal, atur jam, lalu tambahkan pekerjaan.",
               style="Muted.Card.TLabel", font=("Segoe UI", 9)).pack(anchor="w", pady=(2, 0))
