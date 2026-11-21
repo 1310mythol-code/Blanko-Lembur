@@ -393,14 +393,6 @@ class BlankoLemburApp(tk.Tk):
             fg=COLORS["muted"],
             font=("Segoe UI", 9),
         )
-        self.status_label.pack(side="left", padx=22)
-        tk.Label(
-            status,
-            text="●  DATA LOKAL • BISA OFFLINE",
-            bg=COLORS["surface"],
-            fg=COLORS["green"],
-            font=("Segoe UI Semibold", 8),
-        ).pack(side="right", padx=22)
 
     def _section_intro(self, parent: ttk.Frame, number: str, title: str, subtitle: str) -> ttk.Frame:
         block = ttk.Frame(parent, style="Card.TFrame")
@@ -536,16 +528,6 @@ class BlankoLemburApp(tk.Tk):
                 fg="#344054",
                 font=("Segoe UI", 10),
             ).pack(side="left")
-        tk.Frame(aside, bg=COLORS["line"], height=1).pack(fill="x", pady=20)
-        tk.Label(
-            aside,
-            text="Mengganti bulan tidak menghapus data bulan sebelumnya.",
-            bg=COLORS["surface_alt"],
-            fg=COLORS["muted"],
-            font=("Segoe UI", 9),
-            justify="left",
-            wraplength=280,
-        ).pack(anchor="w")
 
     def _legacy_build_officials_tab(self) -> None:
         tab = self.officials_tab
@@ -635,16 +617,6 @@ class BlankoLemburApp(tk.Tk):
         for variable in (self.manager_role_var, self.asmen_role_var):
             if variable.get().strip() == previous_unit:
                 variable.set(unit)
-
-    def _email_publisher(self) -> None:
-        try:
-            os.startfile("mailto:Almito000@gmail.com")
-        except OSError:
-            messagebox.showerror(
-                "Email tidak dapat dibuka",
-                "Buka aplikasi email dan kirim pesan ke Almito000@gmail.com.",
-                parent=self,
-            )
 
     def _refresh_officials_titles(self, *_args) -> None:
         for value, entry, label, prefix in (

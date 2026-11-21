@@ -89,7 +89,7 @@ di Microsoft Word, lalu coba lagi.
 
 INFO APLIKASI DAN PEMBARUAN
 --------------------------
-Versi aplikasi: 1.3.1. Dibuat oleh NAM untuk pegawai RSUP Dr M Djamil.
+Versi aplikasi: 1.3.2. Dibuat oleh NAM untuk pegawai RSUP Dr M Djamil.
 Tab Info aplikasi memuat tombol "Cek untuk Update".
 Tombol memeriksa rilis resmi di repository GitHub Blanko-Lembur. Jika belum
 ada rilis baru, aplikasi menjelaskan bahwa versi saat ini sudah terbaru.
